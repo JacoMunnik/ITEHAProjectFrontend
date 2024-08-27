@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById('products');
 
     if (window.location.pathname.includes('index.html')) {
         loadHomepage();
@@ -16,9 +16,53 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchProducts();
     }
 
+    // Define an array to hold the cart items
+    let cart = [];
+
+    // Check if there's an existing cart in localStorage
+    if (localStorage.getItem('cart')) {
+        cart = JSON.parse(localStorage.getItem('cart'));
+    }
+
+    // Function to add items to the cart
+    function addToCart(product) {
+        // Add the product to the cart array
+        cart.push(product);
+
+        // Save the updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Optional: Alert the user or update the cart count
+        alert(`${product.name} has been added to your cart!`);
+    }
+
     function loadCartPage() {
-        mainContent.innerHTML = '<h2>Your Cart</h2><div id="cart-items"></div>';
-        // Implement cart functionality here
+        mainContent.innerHTML = '<h2>Your Cart</h2><div id="cart-items" class="row"></div>';
+        
+        const cartItemsContainer = document.getElementById('cart-items');
+
+        // Retrieve the cart from localStorage
+        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        if (storedCart.length > 0) {
+            storedCart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'col-md-4';
+                cartItem.innerHTML = `
+                    <div class="card mb-4">
+                        <img src="${item.image}" class="card-img-top" alt="${item.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.name}</h5>
+                            <p class="card-text">${item.description}</p>
+                            <p class="card-text"><strong>${item.price}</strong></p>
+                        </div>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+        } else {
+            cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        }
     }
 
     function loadCheckoutPage() {
@@ -97,37 +141,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to display products on the page
     function displayProducts(products) {
+        const productsContainer = document.getElementById('products');
 
-        const productsContainer = document.getElementById('main-content');
-
-        const productGrid = document.createElement('div');
-        productGrid.id = 'products';
-        productsContainer.appendChild(productGrid);
-
-        products.forEach((product, index) => {
+        products.forEach(product => {
             const productCard = document.createElement('div');
-            productCard.className = 'product-card';
+            productCard.className = 'product-card col-md-4';
 
             productCard.innerHTML = `
                 <img src="${product.image}" alt="${product.name}">
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
                 <p><strong>${product.price}</strong></p>
-                <button class="btn">Add to Cart</button>
+                <button class="btn btn-success">Add to Cart</button>
             `;
 
-            productGrid.appendChild(productCard);
+            // Add event listener to the "Add to Cart" button
+            const addToCartButton = productCard.querySelector('.btn');
+            addToCartButton.addEventListener('click', () => addToCart(product));
+
+            productsContainer.appendChild(productCard);
         });
     }
-    
-    // Function to add a product to the cart
-    function addToCart(productId) {
-        // Implementation for adding product to cart
-        console.log('Add to cart:', productId);
-    }
-    
-    // Fetch and display products when the page loads
-    document.addEventListener('DOMContentLoaded', fetchProducts);
 
     window.addToCart = function(productId) {
         console.log('Adding product to cart:', productId);
