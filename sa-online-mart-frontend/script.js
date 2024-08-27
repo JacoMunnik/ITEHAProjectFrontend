@@ -11,58 +11,83 @@ document.addEventListener('DOMContentLoaded', function() {
         loadAdminPage();
     }
 
+// Define an array to hold the cart items
+let cart = [];
+
+// Check if there's an existing cart in localStorage
+if (localStorage.getItem('cart')) {
+    cart = JSON.parse(localStorage.getItem('cart'));
+}
+
+// Function to add items to the cart
+function addToCart(product) {
+    console.log('Adding to cart:', product); // Log the product object
+
+    if (!product || !product.id || !product.name || !product.imageUrl || !product.description || !product.price) {
+        console.error('Invalid product data:', product);
+        return;
+    }
+
+    // Check if product already exists in the cart
+    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+    if (existingProductIndex > -1) {
+        // Update quantity if product already in cart
+        cart[existingProductIndex].quantity = (cart[existingProductIndex].quantity || 1) + 1;
+    } else {
+        // Add new product to cart with default quantity of 1
+        product.quantity = 1;
+        cart.push(product);
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`${product.name} has been added to your cart!`);
+}
+
+function loadCartPage() {
+    const cartItemsContainer = document.getElementById('cart-items');
+
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    console.log('Retrieved cart:', storedCart); // Log the retrieved cart
+
+    if (storedCart.length > 0) {
+        cartItemsContainer.innerHTML = '';
+        storedCart.forEach(item => {
+            console.log('Cart item:', item); // Log each item
+
+            // Check for missing properties
+            if (!item || !item.imageUrl || !item.name || !item.description || !item.price || !item.quantity) {
+                console.error('Cart item is missing properties:', item);
+                return;
+            }
+
+            const cartItem = document.createElement('div');
+            cartItem.className = 'col-md-4 mb-4';
+            cartItem.innerHTML = `
+                <div class="card">
+                    <img src="${item.imageUrl}" class="card-img-top" alt="${item.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${item.name}</h5>
+                        <p class="card-text">${item.description}</p>
+                        <p class="card-text"><strong>${item.price}</strong></p>
+                        <p class="card-text">Quantity: ${item.quantity}</p>
+                    </div>
+                </div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+        });
+    } else {
+        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+    }
+}
+
+// Call loadCartPage on page load
+document.addEventListener('DOMContentLoaded', loadCartPage);
+
+
+    // Function to load the homepage and fetch products
     function loadHomepage() {
         mainContent.innerHTML = '<div id="products"></div>';
         fetchProducts();
-    }
-
-    // Define an array to hold the cart items
-    let cart = [];
-
-    // Check if there's an existing cart in localStorage
-    if (localStorage.getItem('cart')) {
-        cart = JSON.parse(localStorage.getItem('cart'));
-    }
-
-    // Function to add items to the cart
-    function addToCart(product) {
-        // Add the product to the cart array
-        cart.push(product);
-
-        // Save the updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
-
-        // Optional: Alert the user or update the cart count
-        alert(`${product.name} has been added to your cart!`);
-    }
-
-    function loadCartPage() {
-        mainContent.innerHTML = '<h2>Your Cart</h2><div id="cart-items" class="row"></div>';
-        
-        const cartItemsContainer = document.getElementById('cart-items');
-
-        // Retrieve the cart from localStorage
-        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-
-        if (storedCart.length > 0) {
-            storedCart.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'col-md-4';
-                cartItem.innerHTML = `
-                    <div class="card mb-4">
-                        <img src="${item.image}" class="card-img-top" alt="${item.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.name}</h5>
-                            <p class="card-text">${item.description}</p>
-                            <p class="card-text"><strong>${item.price}</strong></p>
-                        </div>
-                    </div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
-        } else {
-            cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-        }
     }
 
     function loadCheckoutPage() {
@@ -86,15 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const image = document.getElementById('product-image').value;
                 const stock = document.getElementById('product-stock').value;
 
-                // Call your API to add/update product
                 fetch('http://localhost:5295/api/product', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        id, name, description, price, image, stock
-                    })
+                    body: JSON.stringify({ id, name, description, price, image, stock })
                 }).then(response => response.json())
                   .then(data => {
                       alert('Product added/updated successfully!');
@@ -110,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
                 const id = document.getElementById('delete-id').value;
 
-                // Call your API to delete product
                 fetch(`http://localhost:5295/api/product/${id}`, {
                     method: 'DELETE'
                 }).then(response => response.json())
@@ -127,19 +148,16 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchProducts() {
         try {
             const response = await fetch('http://localhost:5295/api/product');
-            console.log('Response status:', response.status); // Debugging line
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const products = await response.json();
-            console.log('Fetched products:', products); // Debugging line
             displayProducts(products);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
     }
-    
-    // Function to display products on the page
+
     function displayProducts(products) {
         const productsContainer = document.getElementById('products');
 
@@ -156,14 +174,10 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
 
             // Add event listener to the "Add to Cart" button
-            const addToCartButton = productCard.querySelector('.btn');
+            const addToCartButton = productCard.querySelector('.btn-success');
             addToCartButton.addEventListener('click', () => addToCart(product));
 
             productsContainer.appendChild(productCard);
         });
     }
-
-    window.addToCart = function(productId) {
-        console.log('Adding product to cart:', productId);
-    };
 });
