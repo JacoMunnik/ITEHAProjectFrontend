@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadHomepage() {
-        mainContent.innerHTML = '<h2>Homepage</h2><div id="products"></div>';
+        mainContent.innerHTML = '<div id="products"></div>';
         fetchProducts();
     }
 

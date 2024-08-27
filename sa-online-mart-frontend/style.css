@@ -109,3 +109,85 @@ footer {
     position: fixed;
     bottom: 0;
 }
+
+/* Style for the product container */
+#products .product-item {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    height: 400px; /* Ensures all product blocks are the same height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Ensures product images fit within the block */
+#products .product-item img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+/* Styles for product titles */
+#products .product-item h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+/* Styles for product prices */
+#products .product-item .price {
+    font-size: 1.25rem;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+/* Styles for the add to cart button */
+#products .product-item .btn {
+    margin-top: auto;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+/* Ensure all product cards have a border and consistent size */
+.product-card {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    height: 400px; /* Adjust height as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: 200px; /* Ensure consistent image size */
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.product-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.product-card p {
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.product-card .btn {
+    margin-top: auto;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
