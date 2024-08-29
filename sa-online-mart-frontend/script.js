@@ -80,6 +80,33 @@ function loadCartPage() {
     }
 }
 
+function loadCheckoutPage() {
+    const totalAmountContainer = document.getElementById('total-amount');
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    if (storedCart.length > 0) {
+        let totalAmount = 0;
+        storedCart.forEach(item => {
+            totalAmount += item.price * (item.quantity || 1);
+        });
+        totalAmountContainer.innerHTML = `<h3>Total Amount: $${totalAmount.toFixed(2)}</h3>`;
+    } else {
+        totalAmountContainer.innerHTML = '<h3>Your cart is empty.</h3>';
+    }
+
+    const checkoutForm = document.getElementById('checkout-form');
+    checkoutForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Clear the cart
+        localStorage.removeItem('cart');
+
+        // Display success message or redirect to a confirmation page
+        alert('Thank you for your purchase!');
+        window.location.href = 'index.html'; // Redirect to homepage or another page
+    });
+}
+
 // Call loadCartPage on page load
 document.addEventListener('DOMContentLoaded', loadCartPage);
 
@@ -96,8 +123,32 @@ document.addEventListener('DOMContentLoaded', loadCartPage);
     }
 
     function loadAdminPage() {
-        mainContent.innerHTML = '<h2>Admin Panel</h2>';
-        // Implement admin functionality here
+        mainContent.innerHTML = `
+            <h2>Admin Panel</h2>
+            <h3>Manage Products</h3>
+            <form id="admin-form">
+                <label for="product-id">Product ID:</label>
+                <input type="number" id="product-id" name="product-id" required><br><br>
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" name="product-name" required><br><br>
+                <label for="product-description">Description:</label>
+                <textarea id="product-description" name="product-description" required></textarea><br><br>
+                <label for="product-price">Price:</label>
+                <input type="number" step="0.01" id="product-price" name="product-price" required><br><br>
+                <label for="product-image">Image URL:</label>
+                <input type="text" id="product-image" name="product-image" required><br><br>
+                <label for="product-stock">Stock:</label>
+                <input type="number" id="product-stock" name="product-stock" required><br><br>
+                <button type="submit">Add/Update Product</button>
+            </form>
+            <h3>Delete Products</h3>
+            <form id="delete-form">
+                <label for="delete-id">Product ID:</label>
+                <input type="number" id="delete-id" name="delete-id" required><br><br>
+                <button type="submit">Delete Product</button>
+            </form>
+        `;
+
         const adminForm = document.getElementById('admin-form');
         const deleteForm = document.getElementById('delete-form');
 
